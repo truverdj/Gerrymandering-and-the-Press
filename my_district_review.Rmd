@@ -1,0 +1,34 @@
+---
+title: "My District"
+author: "Daniel Truver"
+date: "1/25/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+I come from South Carolina's 6th district.
+
+```{r fig.width=4, fig.height=4,echo=FALSE}
+library(png)
+library(grid)
+img <- readPNG("full_6th.png")
+ grid.raster(img)
+```
+
+
+It looks pretty weird. It encompasses Charleston and parts of Columbia.  Compactness does not seem to be relevant though. These are the urban areas of South Carolina, so one could imagine they have similar interests. But then you zoom in and—uh oh...
+
+```{r fig.width=4, fig.height=4,echo=FALSE}
+img2 <- readPNG("cut_6th.png")
+ grid.raster(img2)
+```
+
+Somebody with no sense of irony has cut Charleston in half along Calhoun Street. This is probably for the sake of continuity. They want to keep the coastline as together as possible. I think it's reasonable that people who own property along the beach have fundamentally different concerns than the rest of us. I grew up in this area, so I know that by adding a few subtle labels to the map, we may see an alternate explanation. 
+
+```{r fig.width=4, fig.height=4,echo=FALSE}
+img3 <- readPNG("label_6th.png")
+ grid.raster(img3)
+```
