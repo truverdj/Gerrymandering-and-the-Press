@@ -80,7 +80,7 @@ par(mfrow = c(2,2))
 comp_hist(histograms[["black_prop"]])
 ```
 
-This shows, fairly clearly, that the original map cracked and packed to a much greater extent than the subsequent maps. Note that all the distributions are bimodal (likely reflecting the natural geographic segregation of populations), but the original draw disects the distribution, leaving districts either very black or not at all. 
+This shows, fairly clearly, that the original map cracked and packed to a much greater extent than the subsequent maps. Note that all the distributions are bimodal (likely reflecting the natural geographic segregation of populations), but the original draw bisects the distribution, leaving districts either very black or not at all. 
 
 Next, let's see how extreme the changes were between each interation of the map. Below are boxplots of the differences in proportion of black voting age population. (y-axis = black proportion of district in interation $i$ - black propotion of population in iteration $j$ = how much black proportion in each district changed between maps)
 ```{r}
