@@ -1,0 +1,122 @@
+---
+title: "Class"
+author: "Daniel Truver"
+date: "3/1/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+library(dplyr)
+library(readr)
+library(stringr)
+comp_hist = function(histogram_list){
+  for (i in seq_along(histogram_list)){
+    plot(histogram_list[[i]])
+  }
+}
+```
+
+```{r}
+master = read.csv("dist/popbydistrict-master-house_v2.csv")
+origin = read.csv("dist/popbydistrict-original-house_v2.csv")
+redraw = read.csv("dist/popbydistrict-redraw-house_v2.csv")
+scotus = read.csv("dist/popbydistrict-scotus-house_v2.csv")
+all = list(master, origin, redraw, scotus)
+```
+
+```{r}
+colnames(master)[2] = colnames(origin)[2] = colnames(redraw)[2] = colnames(scotus)[2] = "total"
+all_prop = list()
+i = 1
+for(x in list(master, origin, redraw, scotus)){
+# x = master
+  for (var in names(x)[3:ncol(x)]){
+    var_prop = paste0(var,"_prop")
+    x[,var_prop] = x[,var]/x$total
+  }
+  all_prop[[i]] = x
+  i = i+1
+}
+master = all_prop[[1]]
+origin = all_prop[[2]]
+redraw = all_prop[[3]]
+scotus = all_prop[[4]]
+names(master) = names(master) %>%
+  str_replace_all("P0030002", "one_race") %>%
+  str_replace_all("P0030003", "white") %>%
+  str_replace_all("P0030004", "black") %>%
+  str_replace_all("P0030005", "native") %>%
+  str_replace_all("P0030006", "asian") %>%
+  str_replace_all("P0030007", "pacific") %>%
+  str_replace_all("P0030008", "other") 
+which_props = which(str_detect(names(master), "[a-z]_prop"))
+master = master[,which_props]
+origin = origin[,which_props]
+scotus = scotus[,which_props]
+redraw = redraw[,which_props]
+names(origin) = names(redraw) = names(scotus) = names(master)
+```
+
+Black voting age representation was the primary concern in the redrawing of the NC legislative districts. Below are four histograms showing the proportion of the voting age population that was black in each drawing (original, legislature redraw, special master, accepted SCOTUS) of the district lines. 
+
+```{r}
+histograms = list()
+for (i in seq_along(names(master))){
+  var = names(master)[i]
+  vec_master = master[,var]
+  vec_origin = origin[,var]
+  vec_redraw = redraw[,var]
+  vec_scotus = scotus[,var]
+  hist_master = hist(vec_master, plot = FALSE, breaks = seq(0,1,by=0.05))
+  hist_origin = hist(vec_origin, plot = FALSE, breaks = seq(0,1,by=0.05))
+  hist_redraw = hist(vec_redraw, plot = FALSE, breaks = seq(0,1,by=0.05))
+  hist_scotus = hist(vec_scotus, plot = FALSE, breaks = seq(0,1,by=0.05))
+  res = list(hist_origin, hist_redraw, hist_master, hist_scotus)
+  histograms[[i]] = res
+}
+names(histograms) = names(master)
+par(mfrow = c(2,2))
+comp_hist(histograms[["black_prop"]])
+```
+
+This shows, fairly clearly, that the original map cracked and packed to a much greater extent than the subsequent maps. Note that all the distributions are bimodal (likely reflecting the natural geographic segregation of populations), but the original draw disects the distribution, leaving districts either very black or not at all. 
+
+Next, let's see how extreme the changes were between each interation of the map. Below are boxplots of the differences in proportion of black voting age population. (y-axis = black proportion of district in interation $i$ - black propotion of population in iteration $j$ = how much black proportion in each district changed between maps)
+```{r}
+vec_origin = origin$black_prop
+vec_redraw = redraw$black_prop
+vec_master = master$black_prop
+vec_scotus = scotus$black_prop
+origin_redraw_diff = vec_origin - vec_redraw
+origin_master_diff = vec_origin - vec_master
+origin_scotus_diff = vec_origin - vec_scotus
+redraw_master_diff = vec_redraw - vec_master
+redraw_scotus_diff = vec_redraw - vec_scotus
+master_scotus_diff = vec_master - vec_scotus
+{
+  par(mfrow=c(2,3))
+  boxplot(origin_redraw_diff, main = "origin-redraw", ylim = c(-0.35,0.35))
+  boxplot(origin_master_diff, main = "origin-master", ylim = c(-0.35,0.35))
+  boxplot(origin_scotus_diff, main = "origin-scotus", ylim = c(-0.35,0.35))
+  boxplot(redraw_master_diff, main = "redraw-master", ylim = c(-0.35,0.35))
+  boxplot(redraw_scotus_diff, main = "redraw-scotus", ylim = c(-0.35,0.35))
+  boxplot(master_scotus_diff, main = "master-scotus", ylim = c(-0.35,0.35))
+}
+
+```
+
+We see that the original has more extreme differences than the future maps. Between the original map the and the SCOTUS accepted map, there are changes in black proportion ranging from -0.3 to 0.3 with many extremes. Whereas the changes in black proportion between the special master's map and the SCOTUS approval are between -0.03 and 0.03.
+
+
+
+
+
+
+
+
+
+
+
+
+
